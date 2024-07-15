@@ -1,0 +1,20 @@
+---
+
+eos:
+  platform: eos
+  port: 830
+  connection_options:
+    netconf:
+      extras:
+        ssh_config_file: true
+        auth_strict_key: false
+        timeout_transport: 10
+      transport_options:
+        netconf_force_pty: false
+
+iosxe:
+  platform: ios
+  connection_options:
+    netconf:
+      extras:
+        auth_strict_key: false
