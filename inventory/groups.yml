@@ -13,8 +13,23 @@ eos:
         netconf_force_pty: false
 
 iosxe:
-  platform: ios
+  platform: iosxe
   connection_options:
     netconf:
       extras:
         auth_strict_key: false
+
+iosxr:
+  platform: iosxr
+  connection_options:
+    netconf:
+      extras:
+        auth_strict_key: false
+
+junos:
+  platform: junos
+  connection_options:
+    netconf:
+      extras:
+        auth_strict_key: false
+
