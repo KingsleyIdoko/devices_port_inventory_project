@@ -1,5 +1,5 @@
 ---
-username: admin
-password: admin123
+username: netautoapi
+password: cisco123
 data:
   auth_strict_key: false
