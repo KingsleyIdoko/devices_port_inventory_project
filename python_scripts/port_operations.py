@@ -10,8 +10,8 @@ project_root = os.path.abspath(os.path.join(script_dir, '..'))
 sys.path.insert(0, project_root)
 sys.path.insert(0, os.path.join(project_root, 'utilities_scripts'))
 from utilities_scripts.main_func import main
-from utilities_scripts.connection_api import connect_to_device, edit_device_config  
-
+from utilities_scripts.connection_api import (connect_to_device, edit_device_config, 
+                                              create_interface,update_interface,delete_interface) 
 class InterfaceManager:
     def __init__(self, config_file="config.yml"):
         self.nr = InitNornir(config_file=config_file)
@@ -49,7 +49,7 @@ class InterfaceManager:
             </interfaces>
             """
         try:
-            with connect_to_device(task) as m:  # Use the imported utility function
+            with connect_to_device(task) as m:  
                 print("Connected to the device")
                 try:
                     netconf_reply = m.get_config(source="running")
@@ -64,31 +64,35 @@ class InterfaceManager:
                     print(pretty_json)
                     return None
                 else:
-                    if is_dict:
-                        return relevant_data
-                    else:
-                        pretty_json = json.dumps(relevant_data, indent=4)
-                        return pretty_json
+                    return relevant_data
         except Exception as e:
             return str(e)
 
-    def create(self, task: Task, interface_name, interface_type, description):
-        interface_config = f"""
-        <config>
-            <interfaces xmlns="http://openconfig.net/yang/interfaces">
-                <interface>
-                    <name>{interface_name}</name>
-                    <config>
-                        <name>{interface_name}</name>
-                        <type>{interface_type}</type>
-                        <description>{description}</description>
-                    </config>
-                </interface>
-            </interfaces>
-        </config>
-        """
+    def create(self, task: Task):
         try:
-            netconf_reply = edit_device_config(task, config=interface_config) 
+            int_data = self.get(task=task, is_dict=True, interactive=False)
+            payload = create_interface(int_data)
+            netconf_reply = edit_device_config(task, config=payload) 
+            print(netconf_reply)
+            return "Interface created successfully"
+        except Exception as e:
+            return str(e)
+        
+    def update(self, task: Task):
+        try:
+            int_data = self.get(task=task, is_dict=True, interactive=False)
+            payload = update_interface(int_data)
+            netconf_reply = edit_device_config(task, config=payload) 
+            print(netconf_reply)
+            return "Interface created successfully"
+        except Exception as e:
+            return str(e)
+        
+    def delete(self, task: Task):
+        try:
+            int_data = self.get(task=task, is_dict=True, interactive=False)
+            payload = delete_interface(int_data)
+            netconf_reply = edit_device_config(task, config=payload) 
             print(netconf_reply)
             return "Interface created successfully"
         except Exception as e:

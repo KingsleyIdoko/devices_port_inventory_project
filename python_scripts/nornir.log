@@ -3900,3 +3900,23 @@ nornir.core.exceptions.NornirSubTaskError: Subtask: netconf_get_config (failed)
 2024-07-29 19:54:24,379 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
 2024-07-29 19:58:25,428 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
 2024-07-29 19:58:39,791 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 21:23:20,608 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 21:23:32,062 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 21:23:32,065 - nornir.core.task -    ERROR -      start() - Host 'PE-03': task 'create' failed with traceback:
+Traceback (most recent call last):
+  File "/home/admin/.local/share/virtualenvs/Dev-jffJP19G/lib/python3.9/site-packages/nornir/core/task.py", line 99, in start
+    r = self.task(self, **self.params)
+TypeError: create() missing 3 required positional arguments: 'interface_name', 'interface_type', and 'description'
+
+2024-07-29 21:25:03,489 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 21:25:28,462 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 21:25:32,694 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 21:25:32,695 - nornir.core.task -    ERROR -      start() - Host 'PE-03': task 'create' failed with traceback:
+Traceback (most recent call last):
+  File "/home/admin/.local/share/virtualenvs/Dev-jffJP19G/lib/python3.9/site-packages/nornir/core/task.py", line 99, in start
+    r = self.task(self, **self.params)
+TypeError: create() takes 1 positional argument but 2 were given
+
+2024-07-29 21:27:17,883 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 22:24:49,779 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 22:25:06,130 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
