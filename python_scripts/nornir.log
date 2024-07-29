@@ -3887,3 +3887,16 @@ nornir.core.exceptions.NornirSubTaskError: Subtask: netconf_get_config (failed)
 2024-07-29 19:17:49,776 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
 2024-07-29 19:19:09,656 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
 2024-07-29 19:19:46,560 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:34:54,780 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:38:54,937 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:39:52,264 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:40:33,279 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:40:53,347 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:41:20,611 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:41:39,702 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:42:10,909 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:42:51,209 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:43:27,246 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:54:24,379 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts
+2024-07-29 19:58:25,428 -  nornir.core -     INFO -        run() - Running task 'get' with args {} on 1 hosts
+2024-07-29 19:58:39,791 -  nornir.core -     INFO -        run() - Running task 'create' with args {} on 1 hosts

@@ -2,20 +2,23 @@ import sys, os, warnings, json, xmltodict
 from nornir import InitNornir
 from nornir.core.task import Task
 from nornir_utils.plugins.functions import print_result
-from ncclient import manager
 from rich import print
+
 warnings.simplefilter("ignore", DeprecationWarning)
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, '..'))
 sys.path.insert(0, project_root)
 sys.path.insert(0, os.path.join(project_root, 'utilities_scripts'))
-
-from utilities_scripts.vlan_config import generate_vlan_config
 from utilities_scripts.main_func import main
+from utilities_scripts.connection_api import connect_to_device, edit_device_config  
 
 class InterfaceManager:
     def __init__(self, config_file="config.yml"):
         self.nr = InitNornir(config_file=config_file)
+        self.target_host = None
+
+    def set_target_host(self, hostname):
+        self.target_host = hostname
 
     def operations(self):
         while True:
@@ -37,19 +40,7 @@ class InterfaceManager:
                 print("Invalid choice. Please specify a valid operation.")
                 continue
 
-    def get(self, task: Task, is_dict=False, interactive=False):
-        host = task.host.hostname
-        username = task.host.username
-        password = task.host.password
-        port = task.host.get("port", 830)
-
-        # non_junos_filter = """
-        # <network-instances xmlns="http://openconfig.net/yang/network-instance">
-        #     <network-instance>
-        #     </network-instance>
-        # </network-instances>
-        # """
-
+    def get(self, task: Task, is_dict=False, interactive=True):
         non_junos_filter = """
             <interfaces xmlns="http://openconfig.net/yang/interfaces">
                 <interface>
@@ -58,29 +49,16 @@ class InterfaceManager:
             </interfaces>
             """
         try:
-            with manager.connect(
-                host=host,
-                port=port,
-                username=username,
-                password=password,
-                hostkey_verify=False,
-                allow_agent=False,
-                look_for_keys=False
-            ) as m:
+            with connect_to_device(task) as m:  # Use the imported utility function
                 print("Connected to the device")
                 try:
-                    # If it is a Juniper device
                     netconf_reply = m.get_config(source="running")
                     data_dict = xmltodict.parse(netconf_reply.xml, dict_constructor=dict)
                     relevant_data = data_dict['rpc-reply']['data']['configuration']["interfaces"]["interface"]
-                    relevant_data = [items["name"] for items in relevant_data]
                 except:
-                    # If it's a Cisco or Arista switch
-                    #filter=("subtree", non_junos_filter)
                     netconf_reply = m.get_config(source="running", filter=("subtree", non_junos_filter))
                     data_dict = xmltodict.parse(netconf_reply.xml, dict_constructor=dict)
-                    relevant_data = data_dict
-                    print(relevant_data)
+                    relevant_data = data_dict['rpc-reply']['data']["interfaces"]["interface"]
                 if interactive:
                     pretty_json = json.dumps(relevant_data, indent=4)
                     print(pretty_json)
@@ -94,23 +72,27 @@ class InterfaceManager:
         except Exception as e:
             return str(e)
 
-    def create(self, task: Task, **kwargs):
+    def create(self, task: Task, interface_name, interface_type, description):
+        interface_config = f"""
+        <config>
+            <interfaces xmlns="http://openconfig.net/yang/interfaces">
+                <interface>
+                    <name>{interface_name}</name>
+                    <config>
+                        <name>{interface_name}</name>
+                        <type>{interface_type}</type>
+                        <description>{description}</description>
+                    </config>
+                </interface>
+            </interfaces>
+        </config>
+        """
         try:
-            vlan_data = self.get(task, is_dict=True, interactive=False)
-            return generate_vlan_config(vlan_data)
+            netconf_reply = edit_device_config(task, config=interface_config) 
+            print(netconf_reply)
+            return "Interface created successfully"
         except Exception as e:
-            return f"An error occurred: {str(e)}"
-
-    def update(self, task: Task, **kwargs):
-        return "Update operation is not implemented yet."
-
-    def delete(self, task: Task, **kwargs):
-        return "Delete operation is not implemented yet."
-
-    def set_output_format(self, format_choice: str):
-        if format_choice not in ["json", "xml", "dict"]:
-            raise ValueError("Invalid format choice. Please select 'json', 'xml', or 'dict'.")
-        self.output_format = format_choice
+            return str(e)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
