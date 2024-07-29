@@ -14,6 +14,7 @@ eos:
 
 iosxe:
   platform: iosxe
+  port: 830
   connection_options:
     netconf:
       extras:
@@ -21,6 +22,7 @@ iosxe:
 
 iosxr:
   platform: iosxr
+  port: 830
   connection_options:
     netconf:
       extras:
@@ -28,6 +30,7 @@ iosxr:
 
 junos:
   platform: junos
+  port: 830
   connection_options:
     netconf:
       extras:

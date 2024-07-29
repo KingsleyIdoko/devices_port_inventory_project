@@ -1,13 +1,10 @@
-import sys,os,warnings,json,xmltodict
+import sys, os, warnings, json, xmltodict
 from nornir import InitNornir
 from nornir.core.task import Task
 from nornir_utils.plugins.functions import print_result
 from ncclient import manager
 from rich import print
-
-# Suppress deprecated warnings
 warnings.simplefilter("ignore", DeprecationWarning)
-
 script_dir = os.path.dirname(os.path.realpath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, '..'))
 sys.path.insert(0, project_root)
@@ -23,10 +20,10 @@ class InterfaceManager:
     def operations(self):
         while True:
             print("\nSpecify Operation.....")
-            print("1. Get vlans")
-            print("2. Create vlans")
-            print("3. Update vlans")
-            print("4. Delete vlans")
+            print("1. Get interfaces")
+            print("2. Create interfaces")
+            print("3. Update interfaces")
+            print("4. Delete interfaces")
             operation = input("Enter your choice (1-4): ")
             if operation == "1":
                 return "get"
@@ -40,24 +37,26 @@ class InterfaceManager:
                 print("Invalid choice. Please specify a valid operation.")
                 continue
 
-    def get(self, task: Task, is_dict=False, interactive=True):
+    def get(self, task: Task, is_dict=False, interactive=False):
         host = task.host.hostname
         username = task.host.username
         password = task.host.password
         port = task.host.get("port", 830)
 
-        filter = """
-        <network-instances xmlns="http://openconfig.net/yang/network-instance">
-            <network-instance>
-                <name>default</name>
-                <vlans>
-                    <vlan>
-                        <vlan-id/>
-                    </vlan>
-                </vlans>
-            </network-instance>
-        </network-instances>
-        """
+        # non_junos_filter = """
+        # <network-instances xmlns="http://openconfig.net/yang/network-instance">
+        #     <network-instance>
+        #     </network-instance>
+        # </network-instances>
+        # """
+
+        non_junos_filter = """
+            <interfaces xmlns="http://openconfig.net/yang/interfaces">
+                <interface>
+                    <name/>
+                </interface>
+            </interfaces>
+            """
         try:
             with manager.connect(
                 host=host,
@@ -69,10 +68,19 @@ class InterfaceManager:
                 look_for_keys=False
             ) as m:
                 print("Connected to the device")
-                netconf_reply = m.get_config(source="running", filter=("subtree", filter))
-                data_dict = xmltodict.parse(netconf_reply.xml, dict_constructor=dict)
-                relevant_data = data_dict['rpc-reply']['data']['network-instances']['network-instance']
-
+                try:
+                    # If it is a Juniper device
+                    netconf_reply = m.get_config(source="running")
+                    data_dict = xmltodict.parse(netconf_reply.xml, dict_constructor=dict)
+                    relevant_data = data_dict['rpc-reply']['data']['configuration']["interfaces"]["interface"]
+                    relevant_data = [items["name"] for items in relevant_data]
+                except:
+                    # If it's a Cisco or Arista switch
+                    #filter=("subtree", non_junos_filter)
+                    netconf_reply = m.get_config(source="running", filter=("subtree", non_junos_filter))
+                    data_dict = xmltodict.parse(netconf_reply.xml, dict_constructor=dict)
+                    relevant_data = data_dict
+                    print(relevant_data)
                 if interactive:
                     pretty_json = json.dumps(relevant_data, indent=4)
                     print(pretty_json)
